@@ -355,10 +355,12 @@ main{max-width:1080px; margin:0 auto; padding:60px 24px 40px;}
 .card h3{
   font-family:'Pinyon Script', cursive;
   font-weight:400;
-  font-size:42px;
+  font-size:38px;
   color:var(--vinho);
   margin:0 0 4px;
   line-height:1.15;
+  white-space:nowrap;
+  overflow:hidden;
 }
 .card .notes{
   font-size:11.5px;
@@ -596,7 +598,7 @@ footer p{color:var(--tinta-suave); font-size:15px; margin:4px 0;}
 /* ---------- RESPONSIVO ---------- */
 @media (max-width:760px){
   .grid{gap:18px 10px;}
-  .card h3{font-size:34px;}
+  .card h3{font-size:32px;}
   .card .notes{font-size:10.5px; min-height:4.6em;}
   .card .price{font-size:12px;}
   .card .add-btn{font-size:10px; padding:7px 4px;}
@@ -615,7 +617,7 @@ footer p{color:var(--tinta-suave); font-size:15px; margin:4px 0;}
 }
 @media (max-width:420px){
   .grid{gap:14px 8px;}
-  .card h3{font-size:29px;}
+  .card h3{font-size:28px;}
   .card .vol,.card .price{font-size:10.5px;}
   .card .notes{font-size:10px; min-height:5em;}
   .photo span{font-size:9px;}
@@ -987,6 +989,24 @@ function renderGrid(){
 
     grid.appendChild(card);
   });
+
+  fitCardTitles();
+}
+
+function fitCardTitles(){
+  const titles = document.querySelectorAll('.card h3');
+  titles.forEach(h3 => {
+    const computedStyle = window.getComputedStyle(h3);
+    let size = parseFloat(computedStyle.fontSize);
+    const minSize = 12;
+    h3.style.fontSize = size + 'px';
+    let guard = 0;
+    while (h3.scrollWidth > h3.clientWidth && size > minSize && guard < 60){
+      size -= 1;
+      h3.style.fontSize = size + 'px';
+      guard++;
+    }
+  });
 }
 
 function renderAll(){
@@ -1264,6 +1284,16 @@ document.getElementById('pagerNext').addEventListener('click', () => goToPage(st
    =========================================================== */
 renderAll();
 renderCartBadge();
+
+if (document.fonts && document.fonts.ready){
+  document.fonts.ready.then(fitCardTitles);
+}
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(fitCardTitles, 150);
+});
 
 </script>
 </body>
